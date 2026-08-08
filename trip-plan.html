@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Plan — Odyssey</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="index.html">Odyssey</a>
+
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true" />
+      <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
+      <nav class="site-nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="contact.html">Contact</a>
+        <a href="dashboard.html" class="nav-cart">Booked (0)</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-hero">
+      <div class="container">
+        <h1>Your Trip Plan</h1>
+        <p id="tripPlanHeroText">Your travel plan is empty. Start exploring destinations to add your next journey.</p>
+        <p style="margin-top: 10px;"><a href="dashboard.html" style="color: var(--primary);">View your dashboard instead →</a></p>
+      </div>
+    </section>
+
+    <section class="cart-empty">
+      <div id="tripPlanContent" class="container"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Odyssey Travels. All rights reserved.</p>
+      <a href="index.html">← Back to Home</a>
+    </div>
+  </footer>
+  <script>
+    function readStoredJson(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || 'null');
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function getTripPlan() {
+      try {
+        const plan = JSON.parse(localStorage.getItem('odyssey_trip_plan') || '[]');
+        return Array.isArray(plan) ? plan : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function updateTripPlanCount() {
+      const tripPlanLink = document.querySelector('.nav-cart');
+      const tripPlan = getTripPlan();
+
+      if (tripPlanLink) {
+        tripPlanLink.textContent = `Booked (${tripPlan.length})`;
+      }
+    }
+
+    function renderEmptyState() {
+      document.getElementById('tripPlanHeroText').textContent = 'Your travel plan is empty. Start exploring destinations to add your next journey.';
+      document.getElementById('tripPlanContent').innerHTML = `
+        <div class="cart-empty-box">
+          <div class="cart-icon">🌍</div>
+          <h2>Nothing planned yet</h2>
+          <p>Browse destinations and add a trip to start building your itinerary.</p>
+          <a class="button primary" href="index.html">Start Exploring</a>
+        </div>
+      `;
+    }
+
+    function renderTripPlan(tripPlan) {
+      if (tripPlan.length === 0) {
+        renderEmptyState();
+        return;
+      }
+
+      document.getElementById('tripPlanHeroText').textContent =
+        `You have ${tripPlan.length} booked ${tripPlan.length === 1 ? 'destination' : 'destinations'} ready to go.`;
+
+      document.getElementById('tripPlanContent').innerHTML = `
+        <div class="trip-plan-list">
+          ${tripPlan.map((trip, index) => `
+            <div class="trip-plan-card">
+              <div class="trip-plan-header">
+                <div class="trip-plan-emoji">${trip.emoji || '🌍'}</div>
+                <div>
+                  <p class="eyebrow">Booked destination</p>
+                  <h2>${trip.name}</h2>
+                </div>
+              </div>
+              <div class="trip-plan-meta">
+                <div>
+                  <span>Package price</span>
+                  <strong>${trip.price}</strong>
+                </div>
+                <div>
+                  <span>Status</span>
+                  <strong>Booked</strong>
+                </div>
+              </div>
+              <p class="trip-plan-note">${trip.description || ''}</p>
+              <div class="trip-plan-actions">
+                <button class="button secondary" type="button" onclick="removeTrip(${index})">Remove Booking</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="text-align: center; margin-top: 24px;">
+            <a class="button primary" href="index.html">Book Another Destination</a>
+        </div>
+      `;
+    }
+
+    function removeTrip(index) {
+      const tripPlan = getTripPlan();
+      tripPlan.splice(index, 1);
+      localStorage.setItem('odyssey_trip_plan', JSON.stringify(tripPlan));
+      updateTripPlanCount();
+      renderTripPlan(getTripPlan());
+    }
+
+    function renderSavedForLater() {
+      const savedItems = JSON.parse(localStorage.getItem('odyssey_saved_for_later') || '[]');
+      const container = document.getElementById('tripPlanContent');
+      const section = document.createElement('div');
+      section.className = 'saved-later';
+
+      if (savedItems.length === 0) {
+        return;
+      }
+
+      section.innerHTML = `
+        <h2>Saved for later</h2>
+        <div class="saved-later-list">
+          ${savedItems.map((item, index) => `
+            <div class="saved-later-item">
+              <div class="saved-emoji">${item.emoji || '🌍'}</div>
+              <div class="saved-info">
+                <h3>${item.name}</h3>
+                <p>${item.price || ''} ${item.description ? '• ' + item.description : ''}</p>
+              </div>
+              <div class="saved-actions">
+                <button class="button primary" type="button" data-book="${index}">Book</button>
+                <button class="button secondary" type="button" data-remove="${index}">Remove</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      container.appendChild(section);
+
+      section.querySelectorAll('[data-book]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const item = savedItems[btn.dataset.book];
+          localStorage.setItem('odyssey_selected_destination', JSON.stringify(item));
+          window.location.href = 'package.html';
+        });
+      });
+
+      section.querySelectorAll('[data-remove]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          savedItems.splice(btn.dataset.remove, 1);
+          localStorage.setItem('odyssey_saved_for_later', JSON.stringify(savedItems));
+          section.remove();
+          renderSavedForLater();
+        });
+      });
+    }
+
+    const tripPlan = getTripPlan();
+    updateTripPlanCount();
+    renderTripPlan(tripPlan);
+    renderSavedForLater();
+  </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Odyssey</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="index.html">Odyssey</a>
+
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true" />
+      <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="contact.html" class="active">Contact</a>
+        <a href="dashboard.html" class="nav-cart">Booked (0)</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-hero">
+      <div class="container">
+        <p class="eyebrow">Get in Touch</p>
+        <h1>Contact Odyssey Travel</h1>
+        <p>We’re ready to help you plan flights, excursions, and unforgettable vacations.</p>
+      </div>
+    </section>
+
+    <section class="contact-section">
+      <div class="container contact-grid">
+        <div class="contact-info">
+          <div class="contact-item">
+            <span class="contact-icon">📧</span>
+            <div>
+              <h3>Email</h3>
+              <p>hello@odysseytravels.com</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">📞</span>
+            <div>
+              <h3>Phone</h3>
+              <p>+91 98765 43210</p>
+              <p>+91 91234 56789 (Emergency)</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">⏰</span>
+            <div>
+              <h3>Support Hours</h3>
+              <p>Mon–Sat: 8am – 8pm IST</p>
+              <p>Sun: 9am – 6pm IST</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">📍</span>
+            <div>
+              <h3>Address</h3>
+              <p>Odyssey Travel Co.</p>
+              <p>301 Horizon Tower, Lower Parel, Mumbai, India</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">🌐</span>
+            <div>
+              <h3>Social</h3>
+              <div class="social-links">
+                <a href="https://www.instagram.com/odysseytravels" target="_blank" rel="noopener">Instagram</a>
+                <a href="https://www.facebook.com/odysseytravels" target="_blank" rel="noopener">Facebook</a>
+                <a href="https://x.com/odysseytravels" target="_blank" rel="noopener">Twitter / X</a>
+                <a href="https://www.linkedin.com/company/odysseytravels" target="_blank" rel="noopener">LinkedIn</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form class="contact-form" action="#" method="post">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="Your name" required />
+
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@email.com" required />
+
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="How can we help with your trip?" required></textarea>
+
+          <div id="contactMessage" class="form-message" aria-live="polite"></div>
+
+          <button type="submit" class="button primary">Send Message</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Odyssey Travels. All rights reserved.</p>
+      <a href="index.html">← Back to Home</a>
+    </div>
+  </footer>
+  <script>
+    function getTripPlan() {
+      try {
+        const plan = JSON.parse(localStorage.getItem('odyssey_trip_plan') || '[]');
+        return Array.isArray(plan) ? plan : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function updateTripPlanCount() {
+      const tripPlanLink = document.querySelector('.nav-cart');
+      const tripPlan = getTripPlan();
+
+      if (tripPlanLink) {
+        tripPlanLink.textContent = `Booked (${tripPlan.length})`;
+      }
+    }
+
+    function showContactMessage(text, type) {
+      const messageEl = document.getElementById('contactMessage');
+      messageEl.textContent = text;
+      messageEl.className = 'form-message show ' + type;
+    }
+
+    document.querySelector('.contact-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!name || !email || !message) {
+        showContactMessage('Please fill in all fields before sending.', 'error');
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showContactMessage('Please enter a valid email address.', 'error');
+        return;
+      }
+
+      const submissions = JSON.parse(localStorage.getItem('odyssey_contact_messages') || '[]');
+      submissions.push({ name, email, message, date: new Date().toISOString() });
+      localStorage.setItem('odyssey_contact_messages', JSON.stringify(submissions));
+
+      showContactMessage(
+        `Thanks, ${name}! Your message has been sent. Our team will reach out to you at ${email}.`,
+        'success'
+      );
+      this.reset();
+    });
+
+    updateTripPlanCount();
+  </script>
+</body>
+</html>

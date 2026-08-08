@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Destinations — Odyssey</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="index.html">Odyssey</a>
+
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true" />
+      <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
+      <nav class="site-nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="contact.html">Contact</a>
+        <a href="dashboard.html" class="nav-cart">Booked (0)</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-hero">
+      <div class="container">
+        <p class="eyebrow">Explore the World</p>
+        <h1>Browse Curated Travel Escapes</h1>
+        <p>Choose your next adventure and view package details in one place.</p>
+      </div>
+    </section>
+
+    <section class="product-listing">
+      <div class="container product-grid">
+        <a
+          href="package.html"
+          class="product-card"
+          data-name="Santorini Sunset Escape"
+          data-price="$1,299"
+          data-original-price="$1,699"
+          data-desc="Enjoy 7 days in Santorini with boutique hotel stays, local dining experiences, and unforgettable sunset cruises."
+          data-emoji="🏖️"
+        >
+          <div class="product-image">🏖️</div>
+          <h3>Santorini Sunset Escape</h3>
+          <p class="price">$1,299</p>
+          <span class="card-link">View package →</span>
+        </a>
+        <a
+          href="package.html"
+          class="product-card"
+          data-name="Kyoto Cultural Journey"
+          data-price="$1,850"
+          data-original-price="$2,150"
+          data-desc="Discover Kyoto temples, tea houses, and peaceful gardens with a guided cultural experience."
+          data-emoji="🗾"
+        >
+          <div class="product-image">🗾</div>
+          <h3>Kyoto Cultural Journey</h3>
+          <p class="price">$1,850</p>
+          <span class="card-link">View package →</span>
+        </a>
+        <a
+          href="package.html"
+          class="product-card"
+          data-name="Bali Beach Retreat"
+          data-price="$950"
+          data-original-price="$1,250"
+          data-desc="Relax in Bali with beachfront stays, island dining, and easy access to top coastal spots."
+          data-emoji="🌴"
+        >
+          <div class="product-image">🌴</div>
+          <h3>Bali Beach Retreat</h3>
+          <p class="price">$950</p>
+          <span class="card-link">View package →</span>
+        </a>
+        <a
+          href="package.html"
+          class="product-card"
+          data-name="Paris City Break"
+          data-price="$1,500"
+          data-original-price="$1,850"
+          data-desc="Explore Paris with city-center stays, iconic landmarks, and curated day tours."
+          data-emoji="🗼"
+        >
+          <div class="product-image">🗼</div>
+          <h3>Paris City Break</h3>
+          <p class="price">$1,500</p>
+          <span class="card-link">View package →</span>
+        </a>
+        <a
+          href="package.html"
+          class="product-card"
+          data-name="Swiss Alps Adventure"
+          data-price="$1,950"
+          data-original-price="$2,300"
+          data-desc="Take in mountain views, alpine villages, and scenic rail routes across the Swiss Alps."
+          data-emoji="🏔️"
+        >
+          <div class="product-image">🏔️</div>
+          <h3>Swiss Alps Adventure</h3>
+          <p class="price">$1,950</p>
+          <span class="card-link">View package →</span>
+        </a>
+        <a
+          href="package.html"
+          class="product-card"
+          data-name="Safari in Kenya"
+          data-price="$2,250"
+          data-original-price="$2,750"
+          data-desc="Experience Kenya with luxury safari stays, game drives, and unforgettable wildlife moments."
+          data-emoji="🦁"
+        >
+          <div class="product-image">🦁</div>
+          <h3>Safari in Kenya</h3>
+          <p class="price">$2,250</p>
+          <span class="card-link">View package →</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand light" href="index.html">Odyssey</a>
+        <p>Your gateway to unforgettable travel experiences worldwide.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="trip-plan.html">Trip Plan</a>
+      </div>
+      <div class="footer-links">
+        <h4>Support</h4>
+        <a href="contact.html">Contact Us</a>
+        <a href="contact.html">Travel Help</a>
+        <a href="contact.html">Booking Support</a>
+      </div>
+      <div class="footer-links">
+        <h4>Connect</h4>
+        <a href="contact.html">Instagram</a>
+        <a href="contact.html">Facebook</a>
+        <a href="contact.html">Newsletter</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Odyssey Travels. All rights reserved.</p>
+    </div>
+  </footer>
+  <script>
+    function getTripPlan() {
+      try {
+        const plan = JSON.parse(localStorage.getItem('odyssey_trip_plan') || '[]');
+        return Array.isArray(plan) ? plan : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function updateTripPlanCount() {
+      const tripPlanLink = document.querySelector('.nav-cart');
+      const tripPlan = getTripPlan();
+
+      if (tripPlanLink) {
+        tripPlanLink.textContent = `Booked (${tripPlan.length})`;
+      }
+    }
+
+    function saveSelectedDestination(event) {
+      const card = event.currentTarget;
+      const selectedDestination = {
+        name: card.dataset.name,
+        price: card.dataset.price,
+        originalPrice: card.dataset.originalPrice,
+        description: card.dataset.desc,
+        emoji: card.dataset.emoji
+      };
+
+      localStorage.setItem('odyssey_selected_destination', JSON.stringify(selectedDestination));
+    }
+
+    function updateCardBookingStatus() {
+      const tripPlan = getTripPlan();
+      
+      document.querySelectorAll('.product-card').forEach((card) => {
+        const cardName = card.dataset.name;
+        const linkText = card.querySelector('.card-link');
+        
+        if (tripPlan.some(item => item.name === cardName)) {
+          linkText.textContent = 'Booked ✓';
+          linkText.style.color = 'var(--primary)';
+          linkText.style.fontWeight = 'bold';
+        } else {
+          linkText.textContent = 'View package →';
+          linkText.style.color = '';
+          linkText.style.fontWeight = '';
+        }
+      });
+    }
+
+    document.querySelectorAll('.product-card').forEach((card) => {
+      card.addEventListener('click', saveSelectedDestination);
+    });
+
+    updateTripPlanCount();
+    updateCardBookingStatus();
+
+    // Update booking count when localStorage changes
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'odyssey_trip_plan') {
+        updateTripPlanCount();
+        updateCardBookingStatus();
+      }
+    });
+  </script>
+</body>
+</html>

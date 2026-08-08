@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odyssey | Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+  <header class="dashboard-header">
+    <div class="container dashboard-nav">
+      <a href="index.html" class="logo">Odyssey.</a>
+      <div class="dashboard-actions">
+        <a href="index.html" class="button secondary">Browse Destinations</a>
+        <a href="index.html" class="button secondary">Back to Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <section class="dashboard-hero">
+      <div class="container">
+        <p class="eyebrow">Your travel hub</p>
+        <h1>Welcome back, <span id="dashboardName">Traveler</span></h1>
+        <p>Your upcoming adventures, saved stays, and exclusive offers are ready for you.</p>
+
+        <div class="dashboard-stats">
+          <div class="dashboard-card">
+            <h3>Trips saved</h3>
+            <p id="tripsSavedCount">0</p>
+          </div>
+          <div class="dashboard-card">
+            <h3>Upcoming stays</h3>
+            <p id="upcomingStaysCount">0</p>
+          </div>
+          <div class="dashboard-card">
+            <h3>Member since</h3>
+            <p>2026</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-panel">
+      <article class="panel-card">
+        <h2>Ready for your next getaway?</h2>
+        <ul>
+          <li>Browse new dream destinations curated just for you.</li>
+          <li>Open your saved trips and continue planning with one click.</li>
+          <li>Book premium packages with flexible cancellation.</li>
+        </ul>
+      </article>
+
+      <article class="panel-card">
+        <h2>Account details</h2>
+        <p id="dashboardEmail" style="color: var(--text-light); margin-bottom: 8px;">your account</p>
+        <a href="index.html" class="button primary">Explore More</a>
+      </article>
+    </section>
+
+    <section class="dashboard-bookings">
+      <div class="container">
+        <h2>Your Booked Destinations</h2>
+        <div id="bookedDestinationsContainer"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const storedUser = JSON.parse(localStorage.getItem('odyssey_current_user') || 'null');
+    const nameEl = document.getElementById('dashboardName');
+    const emailEl = document.getElementById('dashboardEmail');
+
+    if (storedUser) {
+      const firstName = storedUser.name?.trim() || 'Traveler';
+      nameEl.textContent = firstName.split(' ')[0];
+      emailEl.textContent = storedUser.email || 'your account';
+    } else {
+      window.location.href = 'index.html?signin=1';
+    }
+
+    function readStoredJson(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || 'null');
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function getTripPlan() {
+      try {
+        const plan = JSON.parse(localStorage.getItem('odyssey_trip_plan') || '[]');
+        return Array.isArray(plan) ? plan : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function renderBookedDestinations() {
+      const tripPlan = getTripPlan();
+      const container = document.getElementById('bookedDestinationsContainer');
+      const tripsSavedCount = document.getElementById('tripsSavedCount');
+      const upcomingStaysCount = document.getElementById('upcomingStaysCount');
+
+      if (tripPlan.length === 0) {
+        container.innerHTML = `
+          <div class="cart-empty-box">
+            <div class="cart-icon">🌍</div>
+            <h2>No destinations booked yet</h2>
+            <p>Browse destinations and add a trip to start building your itinerary.</p>
+            <a class="button primary" href="index.html">Start Exploring</a>
+          </div>
+        `;
+        tripsSavedCount.textContent = '0';
+        upcomingStaysCount.textContent = '0';
+        return;
+      }
+
+      tripsSavedCount.textContent = tripPlan.length;
+      upcomingStaysCount.textContent = tripPlan.length;
+
+      container.innerHTML = `
+        <div class="trip-plan-list">
+          ${tripPlan.map((trip, index) => `
+            <div class="trip-plan-card">
+              <div class="trip-plan-header">
+                <div class="trip-plan-emoji">${trip.emoji || '🌍'}</div>
+                <div>
+                  <p class="eyebrow">Booked destination</p>
+                  <h2>${trip.name}</h2>
+                </div>
+              </div>
+              <div class="trip-plan-meta">
+                <div>
+                  <span>Package price</span>
+                  <strong>${trip.price}</strong>
+                </div>
+                <div>
+                  <span>Status</span>
+                  <strong>Booked</strong>
+                </div>
+              </div>
+              <p class="trip-plan-note">${trip.description || ''}</p>
+              <div class="trip-plan-actions">
+                <button class="button secondary" type="button" onclick="removeBooking(${index})">Remove Booking</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="text-align: center; margin-top: 24px;">
+          <a class="button primary" href="index.html">Book Another Destination</a>
+        </div>
+      `;
+    }
+
+    function removeBooking(index) {
+      const tripPlan = getTripPlan();
+      tripPlan.splice(index, 1);
+      localStorage.setItem('odyssey_trip_plan', JSON.stringify(tripPlan));
+      renderBookedDestinations();
+    }
+
+    renderBookedDestinations();
+  </script>
+</body>
+</html>

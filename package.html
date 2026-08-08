@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Package — Odyssey</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="index.html">Odyssey</a>
+
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true" />
+      <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
+      <nav class="site-nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="contact.html">Contact</a>
+        <a href="dashboard.html" class="nav-cart">Booked (0)</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="product-detail">
+      <div class="container product-detail-grid">
+        <div id="packageEmoji" class="product-detail-image">🏖️</div>
+        <div class="product-detail-info">
+          <p id="packageEyebrow" class="eyebrow">Featured Journey</p>
+          <h1 id="packageName">Santorini Sunset Escape</h1>
+          <p id="packagePrice" class="price large">$1,299 <s>$1,699</s></p>
+          <p id="packageDesc" class="product-desc">Enjoy 7 days in Santorini with boutique hotel stays, local dining experiences, and sunset cruises along the Aegean coast.</p>
+          <p id="packageStatus" class="package-status" style="display: none;"></p>
+
+          <div class="detail-actions">
+            <button id="bookNowButton" class="button primary" type="button">Add to Trip Plan</button>
+            <a id="dashboardLink" class="button secondary" href="dashboard.html" style="display: none;">View in Dashboard</a>
+            <a class="button secondary" href="index.html">← Back to All Destinations</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Odyssey Travels. All rights reserved.</p>
+      <a href="index.html">← Back to Home</a>
+    </div>
+  </footer>
+  <script>
+    const defaultDestination = {
+      name: 'Santorini Sunset Escape',
+      price: '$1,299',
+      originalPrice: '$1,699',
+      description: 'Enjoy 7 days in Santorini with boutique hotel stays, local dining experiences, and sunset cruises along the Aegean coast.',
+      emoji: '🏖️'
+    };
+
+    function readStoredJson(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || 'null');
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function getTripPlan() {
+      try {
+        const plan = JSON.parse(localStorage.getItem('odyssey_trip_plan') || '[]');
+        return Array.isArray(plan) ? plan : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function updateTripPlanCount() {
+      const tripPlanLink = document.querySelector('.nav-cart');
+      const tripPlan = getTripPlan();
+
+      if (tripPlanLink) {
+        tripPlanLink.textContent = `Booked (${tripPlan.length})`;
+      }
+    }
+
+    function getCurrentUser() {
+      try {
+        return JSON.parse(localStorage.getItem('odyssey_current_user') || 'null');
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function renderPackageDetails() {
+      const selectedDestination = readStoredJson('odyssey_selected_destination') || defaultDestination;
+      const priceMarkup = selectedDestination.originalPrice
+        ? `${selectedDestination.price} <s>${selectedDestination.originalPrice}</s>`
+        : selectedDestination.price;
+
+      document.getElementById('packageEmoji').textContent = selectedDestination.emoji || defaultDestination.emoji;
+      document.getElementById('packageName').textContent = selectedDestination.name;
+      document.getElementById('packagePrice').innerHTML = priceMarkup;
+      document.getElementById('packageDesc').textContent = selectedDestination.description || defaultDestination.description;
+
+      return selectedDestination;
+    }
+
+    const selectedDestination = renderPackageDetails();
+    updateTripPlanCount();
+
+    // Check if already booked and update UI accordingly
+    function checkBookingStatus() {
+      const tripPlan = getTripPlan();
+      const bookButton = document.getElementById('bookNowButton');
+      const dashboardLink = document.getElementById('dashboardLink');
+      const statusEl = document.getElementById('packageStatus');
+
+      if (tripPlan.some(item => item.name === selectedDestination.name)) {
+        bookButton.textContent = 'Booked';
+        bookButton.disabled = true;
+        bookButton.style.opacity = '0.6';
+        dashboardLink.style.display = 'inline-block';
+        statusEl.textContent = `${selectedDestination.name} is already in your booked destinations.`;
+        statusEl.style.display = 'block';
+      } else {
+        bookButton.textContent = 'Add to Trip Plan';
+        bookButton.disabled = false;
+        bookButton.style.opacity = '1';
+        dashboardLink.style.display = 'none';
+        statusEl.style.display = 'none';
+      }
+    }
+
+    checkBookingStatus();
+
+    document.getElementById('bookNowButton').addEventListener('click', () => {
+      // Persist the currently displayed package so the flow survives a login redirect
+      localStorage.setItem('odyssey_selected_destination', JSON.stringify(selectedDestination));
+
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        localStorage.setItem('odyssey_pending_action', 'book');
+        window.location.href = 'index.html?signin=1';
+        return;
+      }
+
+      const tripPlan = getTripPlan();
+      if (!tripPlan.some(item => item.name === selectedDestination.name)) {
+        tripPlan.push({ ...selectedDestination, bookedAt: new Date().toISOString() });
+        localStorage.setItem('odyssey_trip_plan', JSON.stringify(tripPlan));
+      }
+
+      updateTripPlanCount();
+      checkBookingStatus();
+
+      const statusEl = document.getElementById('packageStatus');
+      statusEl.textContent = `${selectedDestination.name} has been added to your trip plan.`;
+      statusEl.style.display = 'block';
+    });
+
+    // Update booking status when localStorage changes
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'odyssey_trip_plan') {
+        updateTripPlanCount();
+        checkBookingStatus();
+      }
+    });
+  </script>
+</body>
+</html>

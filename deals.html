@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deals — Odyssey</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="index.html">Odyssey</a>
+
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true" />
+      <label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
+      <nav class="site-nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="contact.html">Contact</a>
+        <a href="dashboard.html" class="nav-cart">Booked (0)</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-hero deals-hero">
+      <div class="container">
+        <p class="eyebrow">Limited Time</p>
+        <h1>Seasonal Travel Offers</h1>
+        <p>Unlock exclusive deals on flights, hotels, and guided trips.</p>
+      </div>
+    </section>
+
+    <section class="deals-list">
+      <div class="container deals-grid">
+        <a
+          href="package.html"
+          class="deal-card"
+          data-name="Santorini Escape"
+          data-price="$1,299"
+          data-original-price="$1,899"
+          data-desc="Grab a limited-time Santorini package with boutique stays, sunset views, and island dining."
+          data-emoji="🏖️"
+        >
+          <span class="deal-badge">32% OFF</span>
+          <div class="deal-emoji">🏖️</div>
+          <h3>Santorini Escape</h3>
+          <p class="price">$1,299 <s>$1,899</s></p>
+          <span class="card-link">Book deal →</span>
+        </a>
+        <a
+          href="package.html"
+          class="deal-card"
+          data-name="Paris City Break"
+          data-price="$1,200"
+          data-original-price="$1,500"
+          data-desc="Enjoy a discounted Paris getaway with handpicked stays, sightseeing, and city experiences."
+          data-emoji="🗼"
+        >
+          <span class="deal-badge">20% OFF</span>
+          <div class="deal-emoji">🗼</div>
+          <h3>Paris City Break</h3>
+          <p class="price">$1,200 <s>$1,500</s></p>
+          <span class="card-link">Book deal →</span>
+        </a>
+        <a
+          href="package.html"
+          class="deal-card"
+          data-name="Kenya Safari"
+          data-price="$2,250"
+          data-original-price="$3,750"
+          data-desc="Book a premium Kenya safari offer with guided wildlife tours and memorable lodge stays."
+          data-emoji="🦁"
+        >
+          <span class="deal-badge">40% OFF</span>
+          <div class="deal-emoji">🦁</div>
+          <h3>Kenya Safari</h3>
+          <p class="price">$2,250 <s>$3,750</s></p>
+          <span class="card-link">Book deal →</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Odyssey Travels. All rights reserved.</p>
+      <a href="index.html">← Back to Home</a>
+    </div>
+  </footer>
+  <script>
+    function getTripPlan() {
+      try {
+        const plan = JSON.parse(localStorage.getItem('odyssey_trip_plan') || '[]');
+        return Array.isArray(plan) ? plan : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function updateTripPlanCount() {
+      const tripPlanLink = document.querySelector('.nav-cart');
+      const tripPlan = getTripPlan();
+
+      if (tripPlanLink) {
+        tripPlanLink.textContent = `Booked (${tripPlan.length})`;
+      }
+    }
+
+    function saveSelectedDestination(event) {
+      const card = event.currentTarget;
+      const selectedDestination = {
+        name: card.dataset.name,
+        price: card.dataset.price,
+        originalPrice: card.dataset.originalPrice,
+        description: card.dataset.desc,
+        emoji: card.dataset.emoji
+      };
+
+      localStorage.setItem('odyssey_selected_destination', JSON.stringify(selectedDestination));
+    }
+
+    function updateCardBookingStatus() {
+      const tripPlan = getTripPlan();
+      
+      document.querySelectorAll('.deal-card').forEach((card) => {
+        const cardName = card.dataset.name;
+        const linkText = card.querySelector('.card-link');
+        
+        if (tripPlan.some(item => item.name === cardName)) {
+          linkText.textContent = 'Booked ✓';
+          linkText.style.color = 'var(--primary)';
+          linkText.style.fontWeight = 'bold';
+        } else {
+          linkText.textContent = 'Book deal →';
+          linkText.style.color = '';
+          linkText.style.fontWeight = '';
+        }
+      });
+    }
+
+    document.querySelectorAll('.deal-card').forEach((card) => {
+      card.addEventListener('click', saveSelectedDestination);
+    });
+
+    updateTripPlanCount();
+    updateCardBookingStatus();
+
+    // Update booking count when localStorage changes
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'odyssey_trip_plan') {
+        updateTripPlanCount();
+        updateCardBookingStatus();
+      }
+    });
+  </script>
+</body>
+</html>
